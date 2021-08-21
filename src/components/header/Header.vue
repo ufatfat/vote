@@ -5,16 +5,22 @@
       <span class="contestName">{{ headerRes.contestName }}</span>
     </div>
     <div class="rightBtn" v-if="headerRes.signedIn">
-      <el-button :type="headerRes.pageName==='Index'?'primary':''" @click="$router.push({path:'/index'})">评审主页</el-button>
-      <el-button :type="headerRes.pageName==='Vote'?'primary':''" @click="$router.push({path:'/vote'})">开始评审</el-button>
+      <el-button style="margin: 0 20px;" :type="headerRes.pageName==='Index'?'primary':''" @click="$router.push({path:'/index'})">评审主页</el-button>
+      <el-button style="margin: 0 20px;" :type="headerRes.pageName==='Overview'||headerRes.pageName==='Detail'?'primary':''" @click="$router.push({path:'/overview'})">开始评审</el-button>
       <el-button :type="headerRes.pageName==='Rule'?'primary':''" @click="$router.push({path:'/rule'})">评审规则</el-button>
-
+      <el-dropdown style="margin: 0 40px;" @command="signOutHandler">
+        <el-button icon="el-icon-user" circle></el-button>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item>{{ userInfo.username }}</el-dropdown-item>
+          <el-dropdown-item command="signOut">登出</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
     </div>
   </div>
 </template>
 
 <script>
-import {mapGetters} from "vuex";
+import {mapGetters, mapMutations} from "vuex";
 
 export default {
   name: "Header",
@@ -35,14 +41,31 @@ export default {
     ])
   },
   watch: {
-    "$route" (val) {
-      this.headerRes.pageName = val.name
+    "$route" () {
+      if (this.token && this.userInfo?.isRulesRead) {
+        this.headerRes.signedIn = true
+        this.headerRes.pageName = this.$route.name
+      }
     }
   },
   mounted() {
-    if (this.token && this.userInfo) {
+    if (this.token && this.userInfo?.isRulesRead) {
       this.headerRes.signedIn = true
       this.headerRes.pageName = this.$route.name
+    }
+  },
+  methods: {
+    ...mapMutations([
+        "signOut",
+    ]),
+    signOutHandler (command) {
+      if (command === "signOut") {
+        this.signOut()
+        this.headerRes.signedIn = false
+        this.$router.push({
+          path: "/sign-in"
+        })
+      }
     }
   }
 }

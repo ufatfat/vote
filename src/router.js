@@ -11,7 +11,7 @@ const router = new Router({
     routes: [
         {
             path: "/",
-            redirect: "/index",
+            redirect: "/rule",
             component: Main,
             name: "Main",
             meta: {
@@ -43,11 +43,20 @@ const router = new Router({
                         requireSignIn: true,
                     }
                 }, {
-                    path: "vote",
-                    component: () => import("@/views/vote/Vote"),
-                    name: "Vote",
+                    path: "overview",
+                    component: () => import("@/views/vote/Overview"),
+                    name: "Overview",
                     meta: {
-                        title: "评图系统 - 开始评审",
+                        title: "评图系统 - 总览",
+                        requireSignIn: true,
+                    }
+                }, {
+                    path: "detail/:workID",
+                    component: () => import("@/views/vote/Detail"),
+                    name: "Detail",
+                    meta: {
+                        title: "评图系统 - 详情",
+                        requireSignIn: true,
                     }
                 }
             ]
@@ -83,7 +92,7 @@ router.beforeEach(async (to, from, next) => {
             }
         } else {
             next({
-                path: "sign-in",
+                path: "/sign-in",
                 query: {
                     redirect: to.fullPath,
                 },

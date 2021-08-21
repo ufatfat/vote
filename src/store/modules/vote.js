@@ -1,46 +1,24 @@
 import storage from "@/utils/storage";
-const expires = 24 * 3600 * 1000
 const vote = {
     state: {
-        token: storage.getItem("token"),
-        userInfo: storage.getItem("userInfo")
+        voteInfo: storage.getItem("voteInfo"),
     },
 
     mutations: {
-        updateToken: (state, token) => {
+        updateVoteInfo: (state, voteInfo) => {
             let data = {
-                name: "token",
-                value: token,
-                expires: expires,
+                name: "voteInfo",
+                value: voteInfo,
             }
             storage.setItem(data)
-            state.token = token
+            state.voteInfo = voteInfo
         },
-        updateUserInfo: (state, userInfo) => {
-            let data = {
-                name: "userInfo",
-                value: userInfo,
-                expires: expires,
-            }
-            storage.setItem(data)
-            state.userInfo = userInfo
-        },
-        signOut: state => {
-            storage.removeItem("token"), storage.removeItem("userInfo")
-            state.token = null, state.userInfo = null
-        }
     },
 
     actions: {
-        updateToken ({ commit }, token) {
-            commit("updateToken", token)
+        updateVoteInfo ({ commit }, voteInfo) {
+            commit("updateVoteInfo", voteInfo)
         },
-        updateUserInfo ({ commit }, userInfo) {
-            commit("updateUserInfo", userInfo)
-        },
-        signOut ({ commit }) {
-            commit("signOut")
-        }
     },
 }
 export default vote

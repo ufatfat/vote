@@ -46,6 +46,7 @@ export default {
     ...mapMutations([
         "updateToken",
         "updateUserInfo",
+        "updateVoteInfo"
     ]),
     signIn () {
       this.updateToken("123456")
@@ -53,6 +54,7 @@ export default {
         isRulesRead: false,
         username: "ufatfat",
       })
+      this.updateVoteInfo([])
       this.$router.push({
         path: "/index"
       })

@@ -1,8 +1,8 @@
 <template>
   <div>
-    <el-container style="margin-top: 32px; height: calc(100vh - 180px);">
+    <el-container style="margin-top: 16px; height: calc(100vh - 120px);">
       <el-main style="height: 100%; width: 100%; padding: 0; display: flex; justify-content: center;">
-        <Works></Works>
+        <OverviewComp></OverviewComp>
       </el-main>
       <el-aside style="height: 100%; display: flex; justify-content: center;">
         <Selected></Selected>
@@ -13,10 +13,10 @@
 
 <script>
 import Selected from "@/components/selected/Selected"
-import Works from "@/components/works/Works"
+import OverviewComp from "@/components/works/Overview"
 export default {
-  name: "Vote",
-  components: {Selected, Works}
+  name: "Overview",
+  components: {Selected, OverviewComp}
 }
 </script>
 

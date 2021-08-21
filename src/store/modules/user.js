@@ -26,8 +26,11 @@ const user = {
             state.userInfo = userInfo
         },
         signOut: state => {
-            storage.removeItem("token"), storage.removeItem("userInfo")
-            state.token = null, state.userInfo = null
+            storage.removeItem("token")
+            storage.removeItem("userInfo")
+            storage.removeItem("voteInfo")
+            state.token = null
+            state.userInfo = null
         }
     },
 

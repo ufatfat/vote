@@ -17,7 +17,7 @@
       <p>3.评分为百分制，作品设计和选手展示表达分别占60 和 40 分。选手的最终得分=现场评图得分×70%+答辩得分×30%，工作人员现场统计计算选手所得的最终分数。最终15名答辩团队按照总成绩，依次分获一二三等奖。</p>
     </div>
     <div style="width: 100%;border: 1px solid #E4E7ED;box-sizing: border-box;border-radius: 4px;height: 70px;display: flex; align-items: center; padding-left: 24px; margin: 50px 0;">
-      <el-checkbox v-model="rulesRead" :disabled="rulesReadCheckboxDisabled">我已阅读上述评审规则{{ countDown>0?"（"+countDown+"s后解禁）":"" }}</el-checkbox>
+      <el-checkbox v-model="rulesRead" :disabled="rulesReadCheckboxDisabled">我已阅读上述评审规则{{ countDown>0?"（"+countDown+"s后可确认）":"" }}</el-checkbox>
     </div>
     <div style="display: flex; justify-content: center">
       <el-button type="primary" @click="enter" :disabled="!rulesRead">进入评审主页</el-button>
@@ -63,7 +63,6 @@ export default {
       let userInfo = this.userInfo
       userInfo.isRulesRead = true
       this.updateUserInfo(userInfo)
-      console.log(this.userInfo)
       this.$router.push({
         path: "/index"
       })
