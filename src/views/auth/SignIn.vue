@@ -48,7 +48,8 @@ export default {
         "updateUserInfo",
         "updateVoteInfo",
         "updateContestConfig",
-        "updateVotesWorks"
+        "updateVotesWorks",
+        "updateMaxIndex",
     ]),
     signIn () {
       this.updateToken("123456")
@@ -56,6 +57,7 @@ export default {
         isRulesRead: false,
         username: "ufatfat",
       })
+      this.updateMaxIndex(5)
       this.updateVoteInfo([])
       this.updateVotesWorks([])
       this.updateContestConfig({"enableMarking": false})

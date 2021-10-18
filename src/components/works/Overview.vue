@@ -50,6 +50,7 @@
 </template>
 <script>
 import {mapGetters, mapMutations} from "vuex";
+import {getOverview} from "@/apis";
 
 export default {
   name: "Overview",
@@ -119,7 +120,7 @@ export default {
       this.updateVotesWorks(votedWorks)
     },
     getData () {
-      let data = [
+      /* let data = [
         {
           name: "测试",
           workID: 1,
@@ -151,11 +152,12 @@ export default {
           checked: false,
           imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png"]
         }
-      ]
+      ]*/
+      let data = getOverview({page: this.page, num: this.num})
       data.forEach(item => {
-        if (this.votedWorks.includes(item.workID)) {
-          item.checked = true
-        }
+        if (this.votedWorks.includes(item.workID)) item.checked = true
+        else item.checked = false
+        if (item.name === "") item.name = "测试"
       })
       this.works = data
     }

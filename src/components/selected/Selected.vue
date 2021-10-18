@@ -72,6 +72,9 @@ export default {
   flex-direction: column;
   align-items: center;
 }
+.selectedBox::-webkit-scrollbar {
+  display: none;
+}
 .selectedBox:hover {
   animation: border .2s ease-in forwards;
 }
