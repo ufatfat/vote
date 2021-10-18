@@ -4,6 +4,8 @@ const general = {
         windowWidth: storage.getItem("windowWidth"),
         windowHeight: storage.getItem("windowHeight"),
         contestConfig: storage.getItem("contestConfig"),
+        maxIndex: storage.getItem("maxIndex"),
+        currentIndex: storage.getItem("currentIndex"),
     },
 
     mutations: {
@@ -30,7 +32,23 @@ const general = {
             }
             storage.setItem(data)
             state.contestConfig = contestConfig
-        }
+        },
+        updateMaxIndex: (state, maxIndex) => {
+            let data = {
+                name: "maxIndex",
+                value: maxIndex
+            }
+            storage.setItem(data)
+            state.maxIndex = maxIndex
+        },
+        updateCurrentIndex: (state, currentIndex) => {
+            let data = {
+                name: "currentIndex",
+                value: currentIndex
+            }
+            storage.setItem(data)
+            state.maxIndex = currentIndex
+        },
     },
 
     actions: {
@@ -42,7 +60,13 @@ const general = {
         },
         updateContestConfig ({ commit }, contestConfig) {
             commit("updateContestConfig", contestConfig)
-        }
+        },
+        updateMaxIndex ({ commit }, maxIndex) {
+            commit("updateMaxIndex", maxIndex)
+        },
+        updateCurrentIndex ({ commit }, currentIndex) {
+            commit("updateMaxIndex", currentIndex)
+        },
     },
 }
 export default general

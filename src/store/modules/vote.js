@@ -30,7 +30,7 @@ const vote = {
         },
         updateVotesWorks ({ commit }, votedWorks) {
             commit("updateVotesWorks", votedWorks)
-        }
+        },
     },
 }
 export default vote
