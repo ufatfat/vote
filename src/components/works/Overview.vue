@@ -9,19 +9,23 @@
         </el-tabs>
       </div>
     </div>
-    <div class="workContainer">
-      <template v-for="(item,idx) in works">
-        <div class="workBox" v-bind:key="idx" :class="item.checked?'workBoxChecked':''" @click="workBoxClickHandler(item)">
-          <div style="width: 188.5px; height: 250px; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-            <div @click.stop><el-checkbox v-model="item.checked"></el-checkbox></div>
-            <div style="width: 148.5px; height: 210px;">
-              <el-image :src="item.imgList[0]" lazy @click.stop="jumpToDetailHandler(item)"></el-image>
+    <div class="workContainer" style="flex-direction: column;">
+      <template v-for="(row, index) in sliceList(works, 5)">
+        <div class="workRow" style="width: 100%; display: flex; justify-content: space-evenly;" v-bind:key="index">
+        <template v-for="(item,idx) in row">
+          <div class="workBox" v-bind:key="idx" :class="item.checked?'workBoxChecked':''" @click="workBoxClickHandler(item)">
+            <div class="imgNCheckBox">
+              <div @click.stop><el-checkbox v-model="item.checked" @change="checkChangeHandler"></el-checkbox></div>
+              <div style="width: 148.5px; height: 210px;">
+                <el-image :src="item.imgList[0]" lazy @click.stop="jumpToDetailHandler(item)"></el-image>
+              </div>
+            </div>
+            <div style="margin-top: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <span class="workName">{{ item.workID }} - {{ item.name }}</span>
+              <span class="tipText">点击图片查看作品详情</span>
             </div>
           </div>
-          <div style="margin-top: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-            <span class="workName">{{ item.workID }} - {{ item.name }}</span>
-            <span class="tipText">点击图片查看作品详情</span>
-          </div>
+        </template>
         </div>
       </template>
     </div>
@@ -39,7 +43,7 @@
           @current-change="pageChangeHandler"
           :page-size.sync="num"
           :total.sync="total"
-          :page-sizes="[10,20,50]"
+          :page-sizes="[5,10,20,50]"
       ></el-pagination>
     </div>
   </div>
@@ -52,147 +56,108 @@ export default {
   data () {
     return {
       page: 1,
-      num: 20,
+      num: 5,
       total: 800,
       activeName: "first",
-      works: [
-        {
-          name: "测试",
-          workID: 1,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 2,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 3,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 4,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 5,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 6,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 7,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 8,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 9,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 10,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 11,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 12,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 13,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 14,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 15,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 16,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 17,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 18,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 19,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },{
-          name: "测试",
-          workID: 20,
-          checked: false,
-          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-        },
-      ],
+      works: [],
     }
+  },
+  mounted() {
+    this.getData()
   },
   computed: {
     ...mapGetters([
-        "voteInfo"
-    ])
+        "voteInfo",
+        "votedWorks",
+    ]),
+    sliceList () {
+      return (data, count) => {
+        let idx = 0
+        let tmpArr = []
+        if (data !== undefined) {
+          for (let i = 0; i < data.length; i ++) {
+            idx = parseInt(i / count)
+            if (tmpArr.length <= idx) {
+              tmpArr.push([])
+            }
+            tmpArr[idx].push(data[i])
+          }
+        }
+        return tmpArr
+      }
+    }
   },
   methods: {
     ...mapMutations([
-        "updateVoteInfo"
+        "updateVoteInfo",
+        "updateVotesWorks"
     ]),
-    pageChangeHandler () {
-
+    pageChangeHandler (curPage) {
+      this.page = curPage
+      this.getData()
     },
-    sizeChangeHandler () {
-
+    sizeChangeHandler (size) {
+      this.num = size
+      this.getData()
     },
     workBoxClickHandler (item) {
       item.checked = !item.checked
-      let data = this.voteInfo
-      if (!item.checked) {
-        data.forEach((val, idx) => {
-          if (val.workID === item.workID) {
-            data.splice(idx, 1)
-          }
-        })
-      } else {
-        data.push(item)
-        this.updateVoteInfo(data)
-      }
+      this.checkChangeHandler(item.checked)
     },
     jumpToDetailHandler (item) {
       this.$router.push({
         path: "/detail/" + item.workID
       })
+    },
+    checkChangeHandler () {
+      let tmpArr = this.works.filter(item => item.checked)
+      let votedWorks = []
+      tmpArr.forEach(item => {
+        votedWorks.push(item.workID)
+      })
+      this.updateVoteInfo(tmpArr)
+      this.updateVotesWorks(votedWorks)
+    },
+    getData () {
+      let data = [
+        {
+          name: "测试",
+          workID: 1,
+          workIdx: 1,
+          checked: false,
+          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png"]
+        },{
+          name: "测试",
+          workID: 2,
+          workIdx: 2,
+          checked: false,
+          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png"]
+        },{
+          name: "测试",
+          workID: 3,
+          workIdx: 3,
+          checked: false,
+          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png"]
+        },{
+          name: "测试",
+          workID: 4,
+          workIdx: 4,
+          checked: false,
+          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png"]
+        },{
+          name: "测试",
+          workID: 5,
+          workIdx: 5,
+          checked: false,
+          imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png"]
+        }
+      ]
+      data.forEach(item => {
+        if (this.votedWorks.includes(item.workID)) {
+          item.checked = true
+        }
+      })
+      this.works = data
     }
   }
 }
@@ -217,9 +182,8 @@ export default {
   height: calc(100% - 120px);
   overflow: auto;
   margin-bottom: 16px;
-  padding: 50px 0;
+  padding: 30px 0;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
 }
@@ -253,15 +217,26 @@ export default {
   color: #4D4F53;
 }
 .workBox {
-  width: 240px;
-  height: 350px;
+  width: calc((100% - 60px) / 5);
+  height: calc((100vh - 240px) / 2);
   border: 1px solid #DCDFE6;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 30px 0 30px calc((100% - 1200px) / 6);
+  margin: 30px 0;
   border-radius: 8px;
+  min-width: 148.5px;
+  max-width: 240px;
+  min-height: 300px;
+  max-height: 350px;
+}
+.workBox .imgNCheckBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 240px;
 }
 .workBox:hover {
   animation: border .2s ease-in forwards;

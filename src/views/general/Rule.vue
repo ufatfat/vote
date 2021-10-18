@@ -73,7 +73,9 @@ export default {
 
 <style scoped>
 #container {
-  margin: 20px 90px 0;
+  padding: 20px 90px 40px;
+  height: calc(100vh - 120px);
+  overflow: scroll;
 }
 .title {
   font-family: Montserrat;

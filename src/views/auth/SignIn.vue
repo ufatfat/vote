@@ -38,7 +38,7 @@ export default {
   mounted () {
     if (this.token && this.userInfo) {
       this.$router.push({
-        path: "/index"
+        path: "/"
       })
     }
   },
@@ -46,7 +46,9 @@ export default {
     ...mapMutations([
         "updateToken",
         "updateUserInfo",
-        "updateVoteInfo"
+        "updateVoteInfo",
+        "updateContestConfig",
+        "updateVotesWorks"
     ]),
     signIn () {
       this.updateToken("123456")
@@ -55,8 +57,10 @@ export default {
         username: "ufatfat",
       })
       this.updateVoteInfo([])
+      this.updateVotesWorks([])
+      this.updateContestConfig({"enableMarking": false})
       this.$router.push({
-        path: "/index"
+        path: "/"
       })
     }
   }

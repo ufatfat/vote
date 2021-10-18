@@ -8,7 +8,7 @@
         </el-tabs>
       </div>
     </div>
-    <div class="workContainer">
+    <div class="workContainer" id="workContainer">
       <div style="text-align: center;font-family: Noto Sans SC;font-style: normal;font-weight: 500;font-size: 16px;line-height: 24px;font-feature-settings: 'tnum' on, 'lnum' on;color: #4D4F53;">{{ workInfo.name }}</div>
       <div class="imgContainer">
         <template v-for="(v,idx) in workInfo.imgList">
@@ -20,7 +20,7 @@
       </div>
       <div style="display: flex; justify-content: center;">
         <div style="height: 40px; padding: 0 10px; border: 1px solid #E4E7ED; border-radius: 4px; display: flex; align-items: center;" :class="workInfo.checked?'checked':''">
-          <el-checkbox v-model="workInfo.checked">将此作品添加为优秀待选作品</el-checkbox>
+          <el-checkbox v-model="workInfo.checked" @change="checkChangeHandler">将此作品添加为优秀待选作品</el-checkbox>
         </div>
       </div>
     </div>
@@ -29,53 +29,57 @@
         <span>共 {{ total }} 个作品</span>
       </el-pagination>
       <el-pagination layout="slot">
-        <span>前往第 <el-input style="width: 60px;"></el-input> 个</span>
+        <span>前往第 <el-input style="width: 60px;" v-model="targetWorkID" @blur="toTargetWork"></el-input> 个</span>
       </el-pagination>
     </div>
     <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-      <el-button icon="el-icon-arrow-left" type="primary">上一个</el-button>
-      <el-button icon="el-icon-check" type="primary">打分</el-button>
-      <el-input style="width: 80px" placeholder="总分栏"></el-input>
-      <el-select v-model="design" placeholder="方案设计">
-        <el-option
-            v-for="(item,idx) in grades"
-            :key="idx"
-            :label="'方案设计 | '+item.grade+'分'"
-            :value="item.grade"
-        >
-          <span>{{ item.levelEng + "/" + item.levelChn + "/" + item.grade}}</span>
-        </el-option>
-      </el-select>
-      <el-select v-model="appearance" placeholder="图纸表现">
-        <el-option
-            v-for="(item,idx) in grades"
-            :key="idx"
-            :label="'图纸表现 | '+item.grade+'分'"
-            :value="item.grade"
-        >
-          <span>{{ item.levelEng + "/" + item.levelChn + "/" + item.grade}}</span>
-        </el-option>
-      </el-select>
-      <el-select v-model="innovation" placeholder="创新性">
-        <el-option
-            v-for="(item,idx) in grades"
-            :key="idx"
-            :label="'创新性 | '+item.grade+'分'"
-            :value="item.grade"
-        >
-          <span>{{ item.levelEng + "/" + item.levelChn + "/" + item.grade}}</span>
-        </el-option>
-      </el-select>
-      <el-button icon="el-icon-edit" type="primary">评审意见</el-button>
-      <el-button icon="el-icon-search" type="primary">保存评审进度</el-button>
-      <el-button type="primary">下一个<i class="el-icon-arrow-right"></i></el-button>
+      <el-button icon="el-icon-arrow-left" type="primary" @click="prevHandler">上一个</el-button>
+      <template v-if="contestConfig.enableMarking">
+        <el-button icon="el-icon-check" type="primary">打分</el-button>
+        <el-input style="width: 80px" placeholder="总分栏"></el-input>
+        <el-select v-model="design" placeholder="方案设计">
+          <el-option
+              v-for="(item,idx) in grades"
+              :key="idx"
+              :label="'方案设计 | '+item.grade+'分'"
+              :value="item.grade"
+          >
+            <span>{{ item.levelEng + "/" + item.levelChn + "/" + item.grade}}</span>
+          </el-option>
+        </el-select>
+        <el-select v-model="appearance" placeholder="图纸表现">
+          <el-option
+              v-for="(item,idx) in grades"
+              :key="idx"
+              :label="'图纸表现 | '+item.grade+'分'"
+              :value="item.grade"
+          >
+            <span>{{ item.levelEng + "/" + item.levelChn + "/" + item.grade}}</span>
+          </el-option>
+        </el-select>
+        <el-select v-model="innovation" placeholder="创新性">
+          <el-option
+              v-for="(item,idx) in grades"
+              :key="idx"
+              :label="'创新性 | '+item.grade+'分'"
+              :value="item.grade"
+          >
+            <span>{{ item.levelEng + "/" + item.levelChn + "/" + item.grade}}</span>
+          </el-option>
+        </el-select>
+        <el-button icon="el-icon-edit" type="primary">评审意见</el-button>
+        <el-button icon="el-icon-search" type="primary">保存评审进度</el-button>
+      </template>
+      <el-button type="primary" @click="nextHandler">下一个<i class="el-icon-arrow-right"></i></el-button>
     </div>
-    <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-      <div style="height: 150px; width: 400px; border: 1px solid #E4E7ED; border-radius: 4px; display: flex; flex-direction: column; align-items: center;">
-        <div style="font-family: Noto Sans SC;font-style: normal;font-weight: normal;font-size: 14px;line-height: 22px;font-feature-settings: 'tnum' on, 'lnum' on;color: #909399; margin: 10px 0;">评审意见填写栏</div>
-        <el-input type="textarea" :rows="4" resize="none" style="width: 370px;" v-model="voteAdvise"></el-input>
+    <template v-if="contestConfig.enableMarking">
+      <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+        <div style="height: 150px; width: 400px; border: 1px solid #E4E7ED; border-radius: 4px; display: flex; flex-direction: column; align-items: center;">
+          <div style="font-family: Noto Sans SC;font-style: normal;font-weight: normal;font-size: 14px;line-height: 22px;font-feature-settings: 'tnum' on, 'lnum' on;color: #909399; margin: 10px 0;">评审意见填写栏</div>
+          <el-input type="textarea" :rows="4" resize="none" style="width: 370px;" v-model="voteAdvise"></el-input>
+        </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 <script>
@@ -85,16 +89,10 @@ export default {
   name: "Detail",
   data () {
     return {
-      page: 1,
-      num: 20,
       total: 800,
+      targetWorkID: null,
       activeName: "first",
-      workInfo:{
-        name: "测试",
-        workID: 1,
-        checked: false,
-        imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/1.jpg", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/1/2.jpg"]
-      },
+      workInfo: {},
       grades: [
         {
           levelEng: "A",
@@ -121,23 +119,38 @@ export default {
     }
   },
   mounted() {
-    console.log(this.workID)
+    let data = {
+      name: "测试",
+      checked: false,
+      imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png"]
+    }
+    data.workID = ~~this.$route.params.workID
+    this.workInfo = data
+    if (this.contestConfig.enableMarking) {
+      document.querySelector("#workContainer").style.height = "calc(100% - 420px)";
+    } else {
+      document.querySelector("#workContainer").style.height = "calc(100% - 172px)";
+    }
+    this.workInfo.checked = this.votedWorks.includes(this.workInfo.workID)
   },
   computed: {
     ...mapGetters([
-      "voteInfo"
+      "voteInfo",
+      "votedWorks",
+      "contestConfig",
     ])
+  },
+  watch: {
+    $route (to) {
+      this.workInfo.workID = ~~to.params.workID
+      this.workInfo.checked = this.votedWorks.includes(this.workInfo.workID)
+    }
   },
   methods: {
     ...mapMutations([
-      "updateVoteInfo"
+      "updateVoteInfo",
+      "updateVotesWorks",
     ]),
-    pageChangeHandler () {
-
-    },
-    sizeChangeHandler () {
-
-    },
     workBoxClickHandler (item) {
       item.checked = !item.checked
       let data = this.voteInfo
@@ -150,6 +163,43 @@ export default {
       } else {
         data.push(item)
         this.updateVoteInfo(data)
+      }
+    },
+    toTargetWork () {
+      this.$router.push({
+        path: "/detail/" + this.targetWorkID
+      })
+    },
+    checkChangeHandler (val) {
+      if (val) {
+        try {
+          let tmp = this.voteInfo
+          if (tmp.length === 0) {
+            tmp.push(this.workInfo)
+          } else {
+            tmp.forEach((item, idx) => {
+              if (item.workID > this.workInfo.workID) {
+                tmp.splice(idx, 0, this.workInfo)
+              }
+              throw new Error("stop")
+            })
+            this.updateVoteInfo(tmp)
+          }
+        } catch (e) {
+          if (e.message !== "stop") throw e
+        }
+        let tmp = this.votedWorks
+        tmp.push(this.workInfo.workID)
+        this.updateVotesWorks(tmp)
+      } else {
+        let tmp = this.voteInfo
+        tmp.forEach((item, idx) => {
+          if (item.workID === this.workInfo.workID) {
+            tmp.splice(idx, 1)
+          }
+        })
+        this.updateVoteInfo(tmp)
+        this.updateVotesWorks(this.votedWorks.filter(item => item !== this.workInfo.workID))
       }
     }
   }
@@ -172,13 +222,11 @@ export default {
   border: 1px solid #E4E7ED;
   box-sizing: border-box;
   border-radius: 4px;
-  height: calc(100% - 420px);
   overflow: auto;
   margin-bottom: 16px;
   padding: 50px 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 .workContainer:hover {
   animation: border .2s ease-in forwards;

@@ -38,6 +38,8 @@ export default {
     ...mapGetters([
         "token",
         "userInfo",
+        "windowWidth",
+        "windowHeight",
     ])
   },
   watch: {
@@ -53,10 +55,20 @@ export default {
       this.headerRes.signedIn = true
       this.headerRes.pageName = this.$route.name
     }
+    let [width, height] = [window.innerWidth, window.innerHeight]
+    this.updateWindowWidth(width)
+    this.updateWindowHeight(height)
+    window.onresize = () => {
+      let [width, height] = [window.innerWidth, window.innerHeight]
+      this.updateWindowWidth(width)
+      this.updateWindowHeight(height)
+    }
   },
   methods: {
     ...mapMutations([
         "signOut",
+        "updateWindowWidth",
+        "updateWindowHeight",
     ]),
     signOutHandler (command) {
       if (command === "signOut") {
