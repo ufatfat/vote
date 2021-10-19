@@ -108,6 +108,11 @@ export default {
             path: "/"
           }, 2000)
         })
+      }).catch(() => {
+        this.$message({
+          type: "error",
+          message: "用户名/密码错误！",
+        })
       })
     }
   }
