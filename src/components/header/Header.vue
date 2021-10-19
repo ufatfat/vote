@@ -36,7 +36,6 @@ export default {
   },
   computed: {
     ...mapGetters([
-        "token",
         "userInfo",
         "windowWidth",
         "windowHeight",
@@ -44,14 +43,14 @@ export default {
   },
   watch: {
     "$route" () {
-      if (this.token && this.userInfo?.isRulesRead) {
+      if (this.userInfo?.isRulesRead) {
         this.headerRes.signedIn = true
         this.headerRes.pageName = this.$route.name
       }
     }
   },
   mounted() {
-    if (this.token && this.userInfo?.isRulesRead) {
+    if (this.userInfo?.isRulesRead) {
       this.headerRes.signedIn = true
       this.headerRes.pageName = this.$route.name
     }

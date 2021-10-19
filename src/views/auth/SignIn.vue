@@ -21,18 +21,23 @@
 
 <script>
 import {mapMutations, mapGetters} from "vuex"
+import {getTotalWorkNum, signIn, getCurrentRoundID, getMaxVotesNum, getVotedWorkInfos} from "../../apis";
+
 export default {
   name: "SignIn",
   data () {
     return {
       phone: "",
       password: "",
+      flag: 0,
     }
   },
   computed: {
     ...mapGetters([
         "token",
         "userInfo",
+        "contestConfig",
+        "votedWorks"
     ])
   },
   mounted () {
@@ -48,21 +53,61 @@ export default {
         "updateUserInfo",
         "updateVoteInfo",
         "updateContestConfig",
-        "updateVotesWorks",
+        "updateVotedWorks",
         "updateMaxIndex",
+        "updateTotalWorkNum",
     ]),
     signIn () {
-      this.updateToken("123456")
-      this.updateUserInfo({
-        isRulesRead: false,
-        username: "ufatfat",
-      })
-      this.updateMaxIndex(5)
-      this.updateVoteInfo([])
-      this.updateVotesWorks([])
-      this.updateContestConfig({"enableMarking": false})
-      this.$router.push({
-        path: "/"
+      let data = {
+        username: this.phone,
+        password: this.password
+      }
+      signIn(data).then(res => {
+        let data = res.data.data
+        this.updateUserInfo({
+          isRulesRead: data.is_rules_read,
+          username: data.name,
+          maxVotesNum: data.max_votes_num,
+          isDone: data.is_done,
+        })
+        this.updateVotedWorks(data.voted_works.length>0?data.voted_works.split(",").map(Number):[])
+        this.updateContestConfig({"enableMarking": false})
+        getTotalWorkNum().then(res => {
+          let num = res.data
+          let contestConfig = this.contestConfig
+          contestConfig.totalWorkNum = num
+          this.updateContestConfig(contestConfig)
+        })
+        getCurrentRoundID().then(res => {
+          let data = res.data
+          let contestConfig = this.contestConfig
+          contestConfig.roundID = data.roundID
+          contestConfig.roundIdx = data.roundIdx
+          this.updateContestConfig(contestConfig)
+          data = {
+            round_id: this.contestConfig.roundID
+          }
+          getMaxVotesNum(data).then(res => {
+            let maxVotesNum = res.data
+            let contestConfig = this.contestConfig
+            contestConfig.maxVotesNum = maxVotesNum
+            this.updateContestConfig(contestConfig)
+          })
+          getVotedWorkInfos({voted_works: this.votedWorks.join(","), round_id: this.contestConfig.roundID}).then(res => {
+            let votedWorkInfos = res.data
+            votedWorkInfos.forEach(item => {
+              item.checked = true
+              if (item.name === "") item.name = "测试"
+              if (!item.imgList ?? true) item.imgList = ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png"]
+            })
+            this.updateVoteInfo(votedWorkInfos)
+          })
+        })
+        setTimeout(() => {
+          this.$router.push({
+            path: "/"
+          }, 2000)
+        })
       })
     }
   }

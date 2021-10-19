@@ -31,6 +31,7 @@ const user = {
             storage.removeItem("voteInfo")
             storage.removeItem("votedWorks")
             storage.removeItem("contestConfig")
+            storage.removeItem("totalWorkNum")
             state.token = null
             state.userInfo = null
         }

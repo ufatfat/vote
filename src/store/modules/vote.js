@@ -14,7 +14,7 @@ const vote = {
             storage.setItem(data)
             state.voteInfo = voteInfo
         },
-        updateVotesWorks: (state, votedWorks) => {
+        updateVotedWorks: (state, votedWorks) => {
             let data = {
                 name: "votedWorks",
                 value: votedWorks,
@@ -28,8 +28,8 @@ const vote = {
         updateVoteInfo ({ commit }, voteInfo) {
             commit("updateVoteInfo", voteInfo)
         },
-        updateVotesWorks ({ commit }, votedWorks) {
-            commit("updateVotesWorks", votedWorks)
+        updateVotedWorks ({ commit }, votedWorks) {
+            commit("updateVotedWorks", votedWorks)
         },
     },
 }

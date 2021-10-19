@@ -1,10 +1,15 @@
 <template>
   <div style="width: 96%;">
     <div class="titleBox">
-      <span class="title">作品详情</span>
+      <div style="display: flex; align-items: center;">
+        <span class="title">
+          作品详情
+        </span>
+        <el-button size="mini" style="margin-left: 20px;" @click="returnToOverview">返回</el-button>
+      </div>
       <div>
         <el-tabs v-model="activeName" tab-position="bottom">
-          <el-tab-pane :label="'作品编号：'+$route.params.workID" name="first"></el-tab-pane>
+          <el-tab-pane :label="'作品编号：'+workInfo.workIdx" name="first"></el-tab-pane>
         </el-tabs>
       </div>
     </div>
@@ -26,10 +31,10 @@
     </div>
     <div style="display: flex; justify-content: space-between;">
       <el-pagination layout="slot">
-        <span>共 {{ total }} 个作品</span>
+        <span>共 {{ contestConfig.totalWorkNum }} 个作品</span>
       </el-pagination>
       <el-pagination layout="slot">
-        <span>前往第 <el-input style="width: 60px;" v-model="targetWorkID" @blur="toTargetWork"></el-input> 个</span>
+        <span>前往第 <el-input style="width: 60px;" v-model="targetWorkIdx" @blur="toTargetWork"></el-input> 个</span>
       </el-pagination>
     </div>
     <div style="display: flex; justify-content: space-between; margin-top: 20px;">
@@ -84,13 +89,14 @@
 </template>
 <script>
 import {mapGetters, mapMutations} from "vuex";
+import {getWorkIDByWorkIdx, getWorkInfoByWorkID} from "../../apis";
 
 export default {
   name: "Detail",
   data () {
     return {
-      total: 800,
-      targetWorkID: null,
+      total: 0,
+      targetWorkIdx: null,
       activeName: "first",
       workInfo: {},
       grades: [
@@ -119,22 +125,16 @@ export default {
     }
   },
   mounted() {
-    let data = {
-      name: "测试",
-      checked: false,
-      imgList: ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png", "https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png"]
-    }
-    data.workID = ~~this.$route.params.workID
-    this.workInfo = data
+    this.getData()
     if (this.contestConfig.enableMarking) {
       document.querySelector("#workContainer").style.height = "calc(100% - 420px)";
     } else {
       document.querySelector("#workContainer").style.height = "calc(100% - 172px)";
     }
-    this.workInfo.checked = this.votedWorks.includes(this.workInfo.workID)
   },
   computed: {
     ...mapGetters([
+      "userInfo",
       "voteInfo",
       "votedWorks",
       "contestConfig",
@@ -144,12 +144,13 @@ export default {
     $route (to) {
       this.workInfo.workID = ~~to.params.workID
       this.workInfo.checked = this.votedWorks.includes(this.workInfo.workID)
+      this.getData()
     }
   },
   methods: {
     ...mapMutations([
       "updateVoteInfo",
-      "updateVotesWorks",
+      "updateVotedWorks",
     ]),
     workBoxClickHandler (item) {
       item.checked = !item.checked
@@ -166,41 +167,96 @@ export default {
       }
     },
     toTargetWork () {
-      this.$router.push({
-        path: "/detail/" + this.targetWorkID
+      let data = {
+        workIdx: (this.targetWorkIdx>0&&this.targetWorkIdx<this.contestConfig.totalWorkNum)?this.targetWorkIdx:this.$message({
+          type: "warning",
+          message: "序号错误！"
+        }),
+        round_idx: this.contestConfig.roundIdx,
+      }
+      getWorkIDByWorkIdx(data).then(res => {
+        let workID = res.data
+        this.$router.push({
+          path: "/detail/" + workID
+        })
+        this.getData()
+      })
+    },
+    prevHandler () {
+      let data = {
+        workIdx: this.workInfo.workIdx>1?this.workInfo.workIdx-1:this.contestConfig.totalWorkNum
+      }
+      getWorkIDByWorkIdx(data).then(res => {
+        let workID = res.data
+        this.$router.push({
+          path: "/detail/" + workID
+        })
+        this.getData()
+      })
+    },
+    nextHandler () {
+      let data = {
+        workIdx: this.workInfo.workIdx<this.contestConfig.totalWorkNum?this.workInfo.workIdx+1:0
+      }
+      getWorkIDByWorkIdx(data).then(res => {
+        let workID = res.data
+        this.$router.push({
+          path: "/detail/" + workID
+        })
+        this.getData()
       })
     },
     checkChangeHandler (val) {
-      if (val) {
-        try {
-          let tmp = this.voteInfo
-          if (tmp.length === 0) {
-            tmp.push(this.workInfo)
-          } else {
-            tmp.forEach((item, idx) => {
-              if (item.workID > this.workInfo.workID) {
-                tmp.splice(idx, 0, this.workInfo)
-              }
-              throw new Error("stop")
-            })
-            this.updateVoteInfo(tmp)
-          }
-        } catch (e) {
-          if (e.message !== "stop") throw e
-        }
-        let tmp = this.votedWorks
-        tmp.push(this.workInfo.workID)
-        this.updateVotesWorks(tmp)
-      } else {
-        let tmp = this.voteInfo
-        tmp.forEach((item, idx) => {
-          if (item.workID === this.workInfo.workID) {
-            tmp.splice(idx, 1)
-          }
+      if (this.userInfo.isDone) {
+        this.$message({
+          type: "warning",
+          message: "已经提交过了，不能再更改了！",
         })
-        this.updateVoteInfo(tmp)
-        this.updateVotesWorks(this.votedWorks.filter(item => item !== this.workInfo.workID))
+        return
       }
+      if ((this.votedWorks.length === this.contestConfig.maxVotesNum) && val) {
+        this.$message({
+          type: "warning",
+          message: "不能再选了！",
+        })
+        return
+      }
+      let voteInfo = this.voteInfo
+      let votedWorks = this.votedWorks
+      if (val) {
+        voteInfo.push(this.workInfo)
+        voteInfo.sort((a, b) => {
+          return a.workID - b.workID
+        })
+        votedWorks.push(this.workInfo.workID)
+        votedWorks.sort((a, b) => {
+          return a - b
+        })
+      } else {
+        voteInfo.splice(voteInfo.findIndex(i => i.workID === this.workInfo.workID), 1)
+        votedWorks.splice(votedWorks.indexOf(this.workInfo.workID), 1)
+      }
+      this.updateVotedWorks(votedWorks)
+      this.updateVoteInfo(voteInfo)
+    },
+    getData () {
+      let data = {
+        work_id: ~~this.$route.params.workID,
+        round_idx: this.contestConfig.roundIdx,
+      }
+      getWorkInfoByWorkID(data).then(res => {
+        let data = res.data
+        if (data.name === "") data.name = "测试"
+        if (!data.imgList ?? true) data.imgList = ["https://ivillages-images.oss-cn-qingdao.aliyuncs.com/1/static/imgs/test.png"]
+        data.checked = false
+        this.workInfo = data
+        this.workInfo.checked = this.votedWorks.includes(this.workInfo.workID)
+      })
+    },
+    returnToOverview () {
+      this.$router.push({
+        path: "/overview",
+      })
     }
   }
 }

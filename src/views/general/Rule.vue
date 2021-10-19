@@ -27,6 +27,7 @@
 
 <script>
 import {mapGetters, mapMutations} from "vuex";
+import {rulesRead} from "../../apis";
 
 export default {
   name: "Rule",
@@ -60,9 +61,11 @@ export default {
         "updateUserInfo"
     ]),
     enter () {
-      let userInfo = this.userInfo
-      userInfo.isRulesRead = true
-      this.updateUserInfo(userInfo)
+      rulesRead().then(() => {
+        let userInfo = this.userInfo
+        userInfo.isRulesRead = true
+        this.updateUserInfo(userInfo)
+      })
       this.$router.push({
         path: "/index"
       })

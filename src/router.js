@@ -72,7 +72,7 @@ const router = new Router({
 })
 
 router.beforeEach(async (to, from, next) => {
-    let token = storage.getItem("token")
+    let token = storage.getItem("userInfo")
     if (to.meta.title) {
         document.title = to.meta.title
     }

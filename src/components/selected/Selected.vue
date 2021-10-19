@@ -2,7 +2,7 @@
  <div style="width: 250px;">
    <div class="titleBox">
      <span class="title">已选方案</span>
-     <span class="stats">已选作品数目：<br/>待选作品数目：</span>
+     <span class="stats">已选作品数目：{{ voteInfo.length }}<br/>待选作品数目：{{ contestConfig.maxVotesNum-voteInfo.length }}</span>
    </div>
    <div class="selectedBox">
      <template v-for="(item,idx) in voteInfo">
@@ -12,17 +12,26 @@
              <el-image :src="item.imgList[0]" lazy @click.stop="jumpToDetailHandler(item)"></el-image>
            </div>
            <div style="margin-top: 5px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-             <span class="tipText">{{ item.workID }} - {{ item.name }}</span>
+             <span class="tipText">{{ item.workIdx }} - {{ item.name }}</span>
            </div>
          </div>
        </template>
      </template>
    </div>
-   <el-button type="primary" style="width: 100%" icon="el-icon-collection-tag">保存进度</el-button>
+   <template v-if="contestConfig.maxVotesNum===voteInfo.length">
+     <div style="display: flex; justify-content: space-between; align-items: center;">
+       <el-button type="primary" style="width: 48%" icon="el-icon-collection-tag" @click="saveTemp">保存进度</el-button>
+       <el-button type="success" style="width: 48%" icon="el-icon-collection-tag" @click="submitVote">提交结果</el-button>
+     </div>
+   </template>
+   <template v-else>
+     <el-button type="primary" style="width: 100%" icon="el-icon-collection-tag" @click="saveTemp">保存进度</el-button>
+   </template>
  </div>
 </template>
 <script>
 import {mapGetters, mapMutations} from "vuex";
+import {saveTemp, submit} from "../../apis";
 
 export default {
   name: "Selected",
@@ -33,18 +42,65 @@ export default {
   },
   computed: {
     ...mapGetters([
-        "voteInfo"
+        "userInfo",
+        "voteInfo",
+        "contestConfig",
+        "votedWorks",
     ]),
   },
   methods: {
     ...mapMutations([
-        "updateVoteInfo"
+        "updateVoteInfo",
+        "updateUserInfo",
     ]),
     jumpToDetailHandler (item) {
       this.$router.push({
         path: "/detail/" + item.workID
       })
     },
+    saveTemp () {
+      let data = {
+        round_id: this.contestConfig.roundID,
+        voted_works: this.votedWorks.join(","),
+      }
+      saveTemp(data).then(() => {
+        this.$message({
+          type: "success",
+          message: "保存成功！"
+        })
+      }).catch(() => {
+        this.$message({
+          type: "error",
+          message: "保存失败！"
+        })
+      })
+    },
+    submitVote () {
+      this.$confirm("提交结果后不可再次修改，确认提交吗？", "", {
+        confirmButtonText: "提交",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        let data = {
+          round_id: this.contestConfig.roundID,
+          voted_works: this.votedWorks.join(","),
+        }
+        submit(data).then(() =>{
+          this.$message({
+            type: "success",
+            message: "保存成功！"
+          })
+          let userInfo = this.userInfo
+          userInfo.isDone = true
+          this.updateUserInfo(userInfo)
+        }).catch(() => {
+          this.$message({
+            type: "error",
+            message: "保存失败！"
+          })
+        })
+      })
+    }
   }
 }
 </script>
@@ -86,7 +142,7 @@ export default {
   line-height: 18px;
   display: flex;
   align-items: center;
-  text-align: right;
+  text-align: left;
   font-feature-settings: 'tnum' on, 'lnum' on;
   color: #303133;
 }
