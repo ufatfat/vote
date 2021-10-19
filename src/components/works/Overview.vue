@@ -13,9 +13,9 @@
       <template v-for="(row, index) in sliceList(works, 5)">
         <div class="workRow" style="width: 100%; display: flex; justify-content: space-evenly;" v-bind:key="index">
         <template v-for="(item,idx) in row">
-          <div class="workBox" v-bind:key="idx" :class="item.checked?'workBoxChecked':''" @click.capture="workBoxClickHandler(item)">
+          <div class="workBox" v-bind:key="idx" :class="item.checked?'workBoxChecked':''" @click="workBoxClickHandler(item)">
             <div class="imgNCheckBox">
-              <div @click.stop><el-checkbox style="z-index: -99" v-model="item.checked" :disabled="userInfo.isDone || ((contestConfig.maxVotesNum === votedWorks.length) && !item.checked)"></el-checkbox></div>
+              <div><el-checkbox v-model="item.checked" :disabled="userInfo.isDone || ((contestConfig.maxVotesNum === votedWorks.length) && !item.checked)" @click.self.prevent></el-checkbox></div>
               <div style="width: 148.5px; height: 210px;">
                 <el-image :src="item.imgList[0]" lazy @click.stop="jumpToDetailHandler(item)"></el-image>
               </div>
