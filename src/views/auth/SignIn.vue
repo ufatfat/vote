@@ -55,7 +55,6 @@ export default {
         "updateContestConfig",
         "updateVotedWorks",
         "updateMaxIndex",
-        "updateTotalWorkNum",
     ]),
     signIn () {
       let data = {
@@ -63,6 +62,7 @@ export default {
         password: this.password
       }
       signIn(data).then(res => {
+        console.log(res)
         let data = res.data.data
         this.updateUserInfo({
           isRulesRead: data.is_rules_read,
@@ -108,11 +108,17 @@ export default {
             path: "/"
           }, 2000)
         })
-      }).catch(() => {
-        this.$message({
-          type: "error",
-          message: "用户名/密码错误！",
-        })
+      }).catch(error => {
+        if (error.response.status === 404)
+          this.$message({
+            type: "error",
+            message: "用户名/密码错误！",
+          })
+        else if (error.response.status === 401)
+          this.$message({
+            type: "error",
+            message: "该账号不是当前比赛评委！"
+          })
       })
     }
   }
