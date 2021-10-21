@@ -37,7 +37,7 @@ export default {
   name: "Selected",
   data () {
     return {
-
+      intervalIdx: 0,
     }
   },
   computed: {
@@ -50,9 +50,10 @@ export default {
   },
   beforeDestroy() {
     this.saveTemp()
+    clearInterval(this.intervalIdx)
   },
   mounted() {
-    setInterval(() => {
+    this.intervalIdx = setInterval(() => {
       if (!this.userInfo.isDone)
         this.saveTemp()
     }, 5 * 60 * 1000)
@@ -72,6 +73,7 @@ export default {
         round_id: this.contestConfig.roundID,
         voted_works: this.votedWorks.join(","),
       }
+      if (this.userInfo.isDone) return
       saveTemp(data).then(() => {
         this.$message({
           type: "success",
