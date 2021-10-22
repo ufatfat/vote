@@ -76,6 +76,10 @@ router.beforeEach(async (to, from, next) => {
     if (to.meta.title) {
         document.title = to.meta.title
     }
+    if (to.path === "/sign-in" && token)
+        next({
+            path: "/index"
+        })
     if (to.meta.requireSignIn) {
         if (token) {
             if(Object.keys(from.query).length === 0) {

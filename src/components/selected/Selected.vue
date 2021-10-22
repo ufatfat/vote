@@ -72,6 +72,7 @@ export default {
       let data = {
         round_id: this.contestConfig.roundID,
         voted_works: this.votedWorks.join(","),
+        round_idx: this.contestConfig.roundIdx,
       }
       if (this.userInfo.isDone) return
       saveTemp(data).then(() => {
@@ -95,6 +96,7 @@ export default {
         let data = {
           round_id: this.contestConfig.roundID,
           voted_works: this.votedWorks.join(","),
+          round_idx: this.contestConfig.roundIdx,
         }
         submit(data).then(() =>{
           this.$message({

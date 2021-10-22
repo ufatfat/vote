@@ -34,7 +34,6 @@ export default {
   },
   computed: {
     ...mapGetters([
-        "token",
         "userInfo",
         "contestConfig",
         "votedWorks"
@@ -49,7 +48,6 @@ export default {
   },
   methods: {
     ...mapMutations([
-        "updateToken",
         "updateUserInfo",
         "updateVoteInfo",
         "updateContestConfig",
@@ -62,7 +60,6 @@ export default {
         password: this.password
       }
       signIn(data).then(res => {
-        console.log(res)
         let data = res.data.data
         this.updateUserInfo({
           isRulesRead: data.is_rules_read,
@@ -106,8 +103,8 @@ export default {
         setTimeout(() => {
           this.$router.push({
             path: "/"
-          }, 2000)
-        })
+          })
+        }, 500)
       }).catch(error => {
         if (error.response.status === 404)
           this.$message({
