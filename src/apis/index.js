@@ -53,3 +53,7 @@ export function getVotedWorkInfos (data) {
         params: data
     })
 }
+
+export function changePassword (data) {
+    return request.put("/voteapi/auth/change_password", data)
+}

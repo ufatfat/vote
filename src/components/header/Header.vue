@@ -8,22 +8,32 @@
       <el-button style="margin: 0 20px;" :type="headerRes.pageName==='Index'?'primary':''" @click="$router.push({path:'/index'})">评审主页</el-button>
       <el-button style="margin: 0 20px;" :type="headerRes.pageName==='Overview'||headerRes.pageName==='Detail'?'primary':''" @click="$router.push({path:'/overview'})">开始评审</el-button>
       <el-button :type="headerRes.pageName==='Rule'?'primary':''" @click="$router.push({path:'/rule'})">评审规则</el-button>
-      <el-dropdown style="margin: 0 40px;" @command="signOutHandler">
+      <el-dropdown style="margin: 0 40px;" @command="commandHandler">
         <el-button icon="el-icon-user" circle></el-button>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item>{{ userInfo.username }}</el-dropdown-item>
+          <el-dropdown-item command="changePassword">修改密码</el-dropdown-item>
           <el-dropdown-item command="signOut">登出</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+    <el-dialog title="修改密码" :visible.sync="changePasswordDialogVisible" :modal="false">
+      <ChangePassword :submit="changePasswordSubmit"></ChangePassword>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="changePasswordDialogVisible=false">取 消</el-button>
+        <el-button type="primary" @click="changePasswordDialogVisible=false;changePasswordSubmit=true">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import {mapGetters, mapMutations} from "vuex";
+import ChangePassword from "./ChangePassword";
 
 export default {
   name: "Header",
+  components: {ChangePassword},
   data () {
     return {
       headerRes: {
@@ -32,6 +42,8 @@ export default {
         signedIn: false,
         pageName: ""
       },
+      changePasswordDialogVisible: false,
+      changePasswordSubmit: false,
     }
   },
   computed: {
@@ -47,6 +59,10 @@ export default {
         this.headerRes.signedIn = true
         this.headerRes.pageName = this.$route.name
       }
+    },
+    userInfo () {
+      if (this.userInfo ?? true)
+        this.headerRes.signedIn = false
     }
   },
   mounted() {
@@ -69,14 +85,25 @@ export default {
         "updateWindowWidth",
         "updateWindowHeight",
     ]),
-    signOutHandler (command) {
-      if (command === "signOut") {
-        this.signOut()
-        this.headerRes.signedIn = false
-        this.$router.push({
-          path: "/sign-in"
-        })
+    commandHandler (command) {
+      switch (command) {
+        case "signOut":
+          this.userSignOut()
+          break
+        case "changePassword":
+          this.changePassword()
+          break
       }
+    },
+    userSignOut () {
+      this.signOut()
+      this.headerRes.signedIn = false
+      this.$router.push({
+        path: "/sign-in"
+      })
+    },
+    changePassword () {
+      this.changePasswordDialogVisible = true
     }
   }
 }

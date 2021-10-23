@@ -66,6 +66,7 @@ export default {
           username: data.name,
           maxVotesNum: data.max_votes_num,
           isDone: data.is_done,
+          judgeID: data.judge_id,
         })
         this.updateVotedWorks(data.voted_works.length>0?data.voted_works.split(",").map(Number):[])
         this.updateContestConfig({"enableMarking": false})
