@@ -4,8 +4,8 @@
       <div class="formTitle">评委账号登录</div>
       <el-form id="form">
         <el-form-item>
-          手机号
-          <el-input v-model="phone" placeholder="请输入手机号"></el-input>
+          账号
+          <el-input v-model="phone" placeholder="请输入账号"></el-input>
         </el-form-item>
         <el-form-item>
           密码
