@@ -39,7 +39,7 @@
       ></el-pagination>
       <el-pagination
           layout="prev, pager, next, jumper"
-          :current-page="page"
+          :current-page.sync="page"
           @current-change="pageChangeHandler"
           :page-size.sync="num"
           :total.sync="contestConfig.totalWorkNum"
@@ -63,6 +63,8 @@ export default {
     }
   },
   mounted() {
+    this.page = this.$route.query["page"] ?? 1
+    this.num = this.$route.query["num"] ?? 10
     this.getData()
   },
   computed: {
@@ -98,10 +100,14 @@ export default {
         "updateVotedWorks"
     ]),
     pageChangeHandler (curPage) {
+      let url = location.pathname + "?page=" + curPage + "&num=" + this.num
+      history.pushState({url: url, title: document.title}, document.title, url)
       this.page = curPage
       this.getData()
     },
     sizeChangeHandler (size) {
+      let url = location.pathname + "?page=" + this.page + "&num=" + size
+      history.pushState({url: url, title: document.title}, document.title, url)
       this.num = size
       this.getData()
     },
