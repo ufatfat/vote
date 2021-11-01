@@ -18,15 +18,10 @@
        </template>
      </template>
    </div>
-   <template v-if="contestConfig.maxVotesNum===voteInfo.length">
-     <div style="display: flex; justify-content: space-between; align-items: center;">
-       <el-button type="primary" style="width: 48%" icon="el-icon-collection-tag" :disabled="userInfo.isDone" @click="saveTemp">保存进度</el-button>
-       <el-button type="success" style="width: 48%" icon="el-icon-collection-tag" :disabled="userInfo.isDone" @click="submitVote">提交结果</el-button>
-     </div>
-   </template>
-   <template v-else>
-     <el-button type="primary" style="width: 100%" icon="el-icon-collection-tag" @click="saveTemp">保存进度</el-button>
-   </template>
+   <div style="display: flex; justify-content: space-between; align-items: center;">
+     <el-button type="primary" style="width: 48%" icon="el-icon-collection-tag" :disabled="userInfo.isDone" @click="saveTemp">保存进度</el-button>
+     <el-button type="success" style="width: 48%" icon="el-icon-collection-tag" :disabled="userInfo.isDone" @click="submitVote">提交结果</el-button>
+   </div>
  </div>
 </template>
 <script>
