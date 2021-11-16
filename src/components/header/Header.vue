@@ -66,6 +66,30 @@ export default {
     }
   },
   mounted() {
+    if ((this.ws.ws ?? true) && this.userInfo?.judgeID) {
+      let ws = new WebSocket("ws://localhost:8080/voteapi/auth/ws?judge_id=" + this.userInfo.judgeID)
+      this.ws.setWebsocket(ws)
+      this.ws.handleRevoteStatus = msg => {
+        if (msg.code === 20001) {
+          this.updateRevote(1)
+          let d = JSON.parse(msg.data)
+          this.updateRevoteWorks(d)
+        } else {
+          this.updateRevote(0)
+          this.updateRevoteWorks([])
+        }
+      }
+      this.ws.handleVoted = msg => {
+        let data
+        if (typeof msg.data === "number") data = [msg.data]
+        else if (typeof msg.data === "string" && msg.data.length > 0) data = msg.data.split(",")
+        else data = []
+        data.forEach((i, idx) => {
+          data[idx] = ~~data[idx]
+        })
+        this.updateRevoteVotedWorks(data)
+      }
+    }
     if (this.userInfo?.isRulesRead) {
       this.headerRes.signedIn = true
       this.headerRes.pageName = this.$route.name
@@ -84,10 +108,14 @@ export default {
         "signOut",
         "updateWindowWidth",
         "updateWindowHeight",
+        "updateRevote",
+        "updateRevoteVotedWorks",
+        "updateRevoteWorks",
     ]),
     commandHandler (command) {
       switch (command) {
         case "signOut":
+          this.ws.ws.close()
           this.userSignOut()
           break
         case "changePassword":

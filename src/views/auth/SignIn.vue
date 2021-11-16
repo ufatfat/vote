@@ -21,7 +21,7 @@
 
 <script>
 import {mapMutations, mapGetters} from "vuex"
-import {getTotalWorkNum, signIn, getCurrentRoundID, getMaxVotesNum, getVotedWorkInfos} from "../../apis";
+import {getTotalWorkNum, signIn, getRoundInfo, getMaxVotesNum, getVotedWorkInfos} from "../../apis";
 
 export default {
   name: "SignIn",
@@ -36,7 +36,8 @@ export default {
     ...mapGetters([
         "userInfo",
         "contestConfig",
-        "votedWorks"
+        "votedWorks",
+        "revoteWorks",
     ])
   },
   mounted () {
@@ -44,6 +45,26 @@ export default {
       this.$router.push({
         path: "/"
       })
+    }
+    this.ws.handleRevoteStatus = msg => {
+      if (msg.code === 20001) {
+        this.updateRevote(1)
+        let d = JSON.parse(msg.data)
+        this.updateRevoteWorks(d)
+      } else {
+        this.updateRevote(0)
+        this.updateRevoteWorks([])
+      }
+    }
+    this.ws.handleVoted = msg => {
+      let data
+      if (typeof msg.data === "number") data = [msg.data]
+      else if (typeof msg.data === "string" && msg.data.length > 0) data = msg.data.split(",")
+      else data = []
+      data.forEach((i, idx) => {
+        data[idx] = ~~data[idx]
+      })
+      this.updateRevoteVotedWorks(data)
     }
   },
   methods: {
@@ -53,6 +74,10 @@ export default {
         "updateContestConfig",
         "updateVotedWorks",
         "updateMaxIndex",
+        "updateRevote",
+        "updateRevoteWorks",
+        "updateRevoteVotedWorks",
+        "signOut"
     ]),
     signIn () {
       let data = {
@@ -60,6 +85,10 @@ export default {
         password: this.password
       }
       signIn(data).then(res => {
+        this.$message({
+          type: "success",
+          message: "登录成功，正在跳转..."
+        })
         let data = res.data.data
         this.updateUserInfo({
           isRulesRead: data.is_rules_read,
@@ -68,6 +97,10 @@ export default {
           isDone: data.is_done,
           judgeID: data.judge_id,
         })
+
+        let ws = new WebSocket("ws://localhost:8080/voteapi/auth/ws?judge_id=" + data.judge_id)
+        this.ws.setWebsocket(ws)
+
         this.updateVotedWorks(data.voted_works.length>0?data.voted_works.split(",").map(Number):[])
         this.updateContestConfig({"enableMarking": false})
         getTotalWorkNum().then(res => {
@@ -76,11 +109,12 @@ export default {
           contestConfig.totalWorkNum = num
           this.updateContestConfig(contestConfig)
         })
-        getCurrentRoundID().then(res => {
+        getRoundInfo().then(res => {
           let data = res.data
           let contestConfig = this.contestConfig
           contestConfig.roundID = data.roundID
           contestConfig.roundIdx = data.roundIdx
+          contestConfig.roundInfo = data.roundInfo
           this.updateContestConfig(contestConfig)
           data = {
             round_id: this.contestConfig.roundID
@@ -105,7 +139,7 @@ export default {
           this.$router.push({
             path: "/"
           })
-        }, 500)
+        }, 1000)
       }).catch(error => {
         if (error.response.status === 404)
           this.$message({

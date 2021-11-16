@@ -30,7 +30,7 @@ export function getWorkIDByWorkIdx (data) {
     })
 }
 
-export function getCurrentRoundID () {
+export function getRoundInfo () {
     return request.get("/voteapi/auth/current_round")
 }
 

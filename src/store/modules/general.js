@@ -6,6 +6,9 @@ const general = {
         contestConfig: storage.getItem("contestConfig"),
         maxIndex: storage.getItem("maxIndex"),
         currentIndex: storage.getItem("currentIndex"),
+        revote: storage.getItem("revote"),
+        revoteWorks: storage.getItem("revoteWorks"),
+        revoteVotedWorks: storage.getItem("revoteVotedWorks"),
     },
 
     mutations: {
@@ -47,8 +50,32 @@ const general = {
                 value: currentIndex
             }
             storage.setItem(data)
-            state.maxIndex = currentIndex
+            state.currentIndex = currentIndex
         },
+        updateRevote: (state, revote) => {
+            let data = {
+                name: "revote",
+                value: revote
+            }
+            storage.setItem(data)
+            state.revote = revote
+        },
+        updateRevoteWorks: (state, revoteWorks) => {
+            let data = {
+                name: "revoteWorks",
+                value: revoteWorks
+            }
+            storage.setItem(data)
+            state.revoteWorks = revoteWorks
+        },
+        updateRevoteVotedWorks: (state, revoteVotedWorks) => {
+            let data = {
+                name: "revoteVotedWorks",
+                value: revoteVotedWorks,
+            }
+            storage.setItem(data)
+            state.revoteVotedWorks = revoteVotedWorks
+        }
     },
 
     actions: {
@@ -67,6 +94,15 @@ const general = {
         updateCurrentIndex ({ commit }, currentIndex) {
             commit("updateMaxIndex", currentIndex)
         },
+        updateRevote ({ commit }, revote) {
+            commit("updateRevote", revote)
+        },
+        updateRevoteWorks({ commit }, revoteWorks) {
+            commit("updateRevoteWorks", revoteWorks)
+        },
+        updateRevoteVotedWorks({ commit }, revoteVotedWorks) {
+            commit("updateRevoteVotedWorks", revoteVotedWorks)
+        }
     },
 }
 export default general

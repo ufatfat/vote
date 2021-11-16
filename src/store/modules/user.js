@@ -22,6 +22,9 @@ const user = {
             storage.removeItem("votedWorks")
             storage.removeItem("contestConfig")
             storage.removeItem("totalWorkNum")
+            storage.removeItem("revote")
+            storage.removeItem("revoteWorks")
+            storage.removeItem("revoteVotedWorks")
             state.userInfo = null
         }
     },

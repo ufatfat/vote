@@ -19,8 +19,8 @@
      </template>
    </div>
    <div style="display: flex; justify-content: space-between; align-items: center;">
-     <el-button type="primary" style="width: 48%" icon="el-icon-collection-tag" :disabled="userInfo.isDone" @click="saveTemp">保存进度</el-button>
-     <el-button type="success" style="width: 48%" icon="el-icon-collection-tag" :disabled="userInfo.isDone" @click="submitVote">提交结果</el-button>
+     <el-button type="primary" style="width: 48%" icon="el-icon-collection-tag" :disabled="userInfo.isDone || revote === 1" @click="saveTemp">保存进度</el-button>
+     <el-button type="success" style="width: 48%" icon="el-icon-collection-tag" :disabled="userInfo.isDone || revote === 1" @click="submitVote">提交结果</el-button>
    </div>
  </div>
 </template>
@@ -41,6 +41,7 @@ export default {
         "voteInfo",
         "contestConfig",
         "votedWorks",
+        "revote",
     ]),
   },
   beforeDestroy() {
